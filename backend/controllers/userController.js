@@ -56,21 +56,52 @@ const registerUser = asyncHandler (async(req, res)=>{
 // @description Logout User
 // route POST /api/users/logout
 const logoutUser = asyncHandler (async(req, res)=>{
-    res.status(200).json({message: "Logout User"});
+    res.cookie('jwt', '', {
+        httpOnly: true,
+        expires: new Date(0)
+    } )
+    res.status(200).json({message: "User logged out"});
 });
 
 // @description Get user profile
 // route POST /api/users/profile
 // @access private
 const getUserProfile = asyncHandler (async(req, res)=>{
-    res.status(200).json({message: "User Profile"});
+    const user = {
+        _id: req.user._id,
+        name: req.user.name,
+        email: req.user.email
+    }
+    // console.log(req.user);
+    res.status(200).json(user);
 });
 
 // @description Update user profile
 // route PUT /api/users/profile
 // @access private
 const updateUserProfile = asyncHandler (async(req, res)=>{
-    res.status(200).json({message: "Update user profile"});
+    const user = await User.findById(req.user._id);
+
+    if (user){
+        user.name = req.body.name || user.name;
+        user.email = req.body.email || user.email;
+
+        if (req.password){
+            user.password = req.body.password;
+        }
+
+        const updatedData = await user.save();
+        res.status(200).json({
+            _id: updatedData.id,
+            name: updatedData.name,
+            email: updatedData.email
+        })
+        // res.status(200).json({message: "Update user profile"});
+    }else{
+        res.status(404);
+        throw new Error('User not found');
+    }
+    
 });
 
 

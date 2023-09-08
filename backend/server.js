@@ -1,6 +1,7 @@
 import express from "express";
 import dotenv from "dotenv";
 dotenv.config();
+import cookieParser from "cookie-parser";
 import { notFound, errorHandler } from "./middleware/errorMiddleware.js";
 import connectDb from "./config/db.js";
 import userRoutes from './routes/userRoutes.js';
@@ -17,6 +18,7 @@ app.get('/', (req, res)=>(
     res.send('Hello World')
 ))
 
+app.use(cookieParser())
 app.use('/api/users', userRoutes);
 
 
